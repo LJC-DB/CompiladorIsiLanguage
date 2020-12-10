@@ -1,0 +1,9 @@
+# palavras reservadas
+programa
+fimprog.
+declare
+leia
+escreva
+se
+entao
+senao

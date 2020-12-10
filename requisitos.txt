@@ -1,0 +1,23 @@
+REQUISITOS
+* 2 tipos de variáveis (um é TEXTO)
+* if/else
+* while
+* precedencia em expressoes matemáticas
+* verificação de variáveis não declaradas (cada variável utilizada deve ser verificada se foi declarada)
+* atribuições: verificação de tipos
+* read e print
+* aceita numeros decimais
+
+
+
+LINGUAGEM FINAL: c
+
+
+antlr4 -Dlanguage=Python3 MyGrammar.g4
+
+https://github.com/professorisidro/IsiLanguageEmbriao/blob/master/IsiLang.g4
+
+
+
+https://github.com/professorisidro/IsiLanguageEmbriao
+https://github.com/professorisidro/AnalisadorLexico

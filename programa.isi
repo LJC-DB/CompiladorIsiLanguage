@@ -1,0 +1,21 @@
+programa
+
+declare numero a,b,c,d.
+escreva("Programa Teste").
+escreva ("batata").
+leia (a).
+escreva ("Digite B").
+leia (b).
+
+asdaf342 := "Teste".
+
+
+se (a < b) entao {
+    c := a + b.
+} senao {
+    c := a - b.
+}
+
+d := 5.5 * a + b.
+
+fimprog.
