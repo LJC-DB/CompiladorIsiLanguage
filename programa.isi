@@ -7,13 +7,13 @@ leia (a).
 escreva ("Digite B").
 leia (b).
 
-asdaf342 := "Teste".
+a := "Teste".
 
 enquanto (a < b) {
     c := ((a) + b).
 }
 
-se (a < b) entao {
+se (a < a) entao {
     c := a + b.
 } senao {
     c := a - b.

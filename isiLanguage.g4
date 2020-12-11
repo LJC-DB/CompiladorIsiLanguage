@@ -1,86 +1,180 @@
- grammar isiLanguage;
+grammar isiLanguage;
 
 @header{
-
+    import { SymbolTable, Symbol, SemanticError } from '../batata.js'
 }
 
 @members{
-    self.pegueToken=lambda : self._input.LT(-1).text
-    self.symbolTable = {}
+    this.sTable = new SymbolTable();
+    this.pegueToken = () => this._input.LT(-1).text;
 
-    def a():
-        self._id = self.pegueToken()
-        self.symbolTable[self._id] = (self._tmpTipo, None)
-        print(self.symbolTable[self._id])
-    self.declaraVar = a
+    this.declaraVar = () => {
+        const varNome = this.pegueToken()
+        const symbol = new Symbol(varNome, this.varTipo, null)
+        this.sTable.addSymbol(varNome, symbol)
+        console.log(this.sTable.table)
+    }
 
+    this.verificaVar = (v) => {
+        if (!this.sTable.existSymbol(v)) throw new SemanticError(`Variável "${v}" não foi declarada`)
+
+    }
 }
 
 prog: 'programa' decl bloco  'fimprog.'
         ;
 
-decl:  'declare' tipo
-{
-self._tmpTipo = self.pegueToken()
-} (declaraID)+
-        ;
+decl:  
+    'declare' 
+    tipo { this.varTipo = this.pegueToken() } 
+    (declaraID)+
+    ;
 
-declaraID:  ID {self.a()}
-            (COMMA  ID )*
-            DOT
-           ;
+declaraID:  
+    ID { this.declaraVar() }
+    (
+    COMMA
+    ID { this.declaraVar() }
+    )*
+    DOT
+    ;
 
-tipo  : 'numero'
-      | 'texto'
-      ;
+tipo :
+      'numero' 
+    | 'texto'
+    ;
 
-bloco: (cmd)+;
+bloco :
+    (cmd)+;
 
-cmd	  : cmd_leitura
+cmd	: cmd_leitura
       | cmd_escrita
       | cmd_attrib
       | cmd_condicional
       | cmd_loop
       ;
 
-cmd_loop : 'enquanto' PS_OP ID REL (ID | NUMBER) PS_CL
-            CB_OP
-                bloco
-            CB_CL
-            ;
+cmd_loop :
+    'enquanto'
+    PS_OP
+    ID
+        {
+        this.varNome = this.pegueToken()
+        this.verificaVar(this.varNome)
+        }
+    REL 
+    (
+    ID
+        {
+        this.varNome = this.pegueToken()
+        this.verificaVar(this.varNome)
+        } 
+    | 
+    NUMBER
+    ) 
+    PS_CL
+    CB_OP
+    bloco
+    CB_CL
+    ;
 
-cmd_leitura	: 'leia' PS_OP
-                     ID
-                     PS_CL
-                     DOT
-            ;
+cmd_leitura	:
+    'leia'
+    PS_OP
+    ID 
+        {
+        this.varNome = this.pegueToken()
+        this.verificaVar(this.varNome)
+        }
+    PS_CL
+    DOT
+    ;
 
-cmd_escrita	: 'escreva' PS_OP
-                        (ID | TEXTO)
-                        PS_CL
-                        DOT
-            ;
+cmd_escrita	: 
+    'escreva' 
+    PS_OP
+    (
+    ID 
+        {
+        this.varNome = this.pegueToken()
+        this.verificaVar(this.varNome)
+        }
+    |
+    TEXTO
+    )
+    PS_CL
+    DOT
+    ;
 
-cmd_attrib	:  ID
-                ATTR
-                (expr | TEXTO)
-                DOT
-            ;
+cmd_attrib	:  
+    ID
+        {
+        this.varNome = this.pegueToken()
+        this.verificaVar(this.varNome)
+        }
+    ATTR
+    (
+    expr
+    |
+    TEXTO
+    )
+    DOT
+    ;
 
-cmd_condicional: 'se' PS_OP ID REL (ID | NUMBER) PS_CL 'entao' CB_OP
-                    (cmd)+
-                CB_CL
-                (
-                'senao' CB_OP
-                    bloco
-                CB_CL
-                )?;
+cmd_condicional: 
+    'se' 
+    PS_OP 
+    ID
+        {
+        this.varNome = this.pegueToken()
+        this.verificaVar(this.varNome)
+        }
+    REL
+    (
+    ID
+        {
+        this.varNome = this.pegueToken()
+        this.verificaVar(this.varNome)
+        } 
+    | 
+    NUMBER
+    ) 
+    PS_CL 
+    'entao' 
+    CB_OP
+    (cmd)+
+    CB_CL
+    (
+    'senao' 
+    CB_OP
+    bloco
+    CB_CL
+    )?
+    ;
+    
 
-expr		:  termo MATH expr | termo
-			;
+expr :
+    termo
+    MATH 
+    expr 
+    | 
+    termo
+    ;
 
-termo		: ID | NUMBER | PS_OP expr PS_CL
-            ;
+termo:
+    ID
+        {
+            this.varNome = this.pegueToken()
+            this.verificaVar(this.varNome)
+            // TODO: this.verificaTipo(this.varNome)
+        }
+    | 
+    NUMBER
+    | 
+    PS_OP
+    expr
+    PS_CL
+    ;
 // fator :
 //             NUMBER | ID | (expr)
 //         ;

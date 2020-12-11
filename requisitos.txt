@@ -13,7 +13,7 @@ REQUISITOS
 LINGUAGEM FINAL: c
 
 
-antlr4 -Dlanguage=Python3 MyGrammar.g4
+antlr4 -Dlanguage=JavaScript MyGrammar.g4
 
 https://github.com/professorisidro/IsiLanguageEmbriao/blob/master/IsiLang.g4
 

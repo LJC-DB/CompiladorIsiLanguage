@@ -1,0 +1,24 @@
+{
+  "name": "isi-language",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "compile": "java -jar antlr-4.9-complete.jar -Dlanguage=JavaScript isiLanguage.g4 -o ./src/antlr4",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LJC-DB/CompiladorIsiLanguage.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LJC-DB/CompiladorIsiLanguage/issues"
+  },
+  "homepage": "https://github.com/LJC-DB/CompiladorIsiLanguage#readme",
+  "dependencies": {
+    "antlr4": "^4.9.0"
+  }
+}
