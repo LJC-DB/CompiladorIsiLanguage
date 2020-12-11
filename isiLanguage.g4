@@ -1,12 +1,31 @@
  grammar isiLanguage;
 
+@header{
+
+}
+
+@members{
+    self.pegueToken=lambda : self._input.LT(-1).text
+    self.symbolTable = {}
+
+    def a():
+        self._id = self.pegueToken()
+        self.symbolTable[self._id] = (self._tmpTipo, None)
+        print(self.symbolTable[self._id])
+    self.declaraVar = a
+
+}
+
 prog: 'programa' decl bloco  'fimprog.'
         ;
 
-decl:  'declare' tipo (declaraID)+
+decl:  'declare' tipo
+{
+self._tmpTipo = self.pegueToken()
+} (declaraID)+
         ;
 
-declaraID:  ID
+declaraID:  ID {self.a()}
             (COMMA  ID )*
             DOT
            ;
@@ -15,46 +34,52 @@ tipo  : 'numero'
       | 'texto'
       ;
 
-bloco	:  (cmd)+
-		  ;
+bloco: (cmd)+;
 
-cmd		:  cmdleitura
-      |  cmdescrita
-      |  cmdattrib
-      |  cmdcondicional
+cmd	  : cmd_leitura
+      | cmd_escrita
+      | cmd_attrib
+      | cmd_condicional
+      | cmd_loop
       ;
 
-cmdleitura	: 'leia' PS_OP
+cmd_loop : 'enquanto' PS_OP ID REL (ID | NUMBER) PS_CL
+            CB_OP
+                bloco
+            CB_CL
+            ;
+
+cmd_leitura	: 'leia' PS_OP
                      ID
                      PS_CL
                      DOT
             ;
 
-cmdescrita	: 'escreva' PS_OP
+cmd_escrita	: 'escreva' PS_OP
                         (ID | TEXTO)
                         PS_CL
                         DOT
             ;
 
-cmdattrib	:  ID
+cmd_attrib	:  ID
                 ATTR
                 (expr | TEXTO)
                 DOT
             ;
 
-cmdcondicional: 'se' PS_OP ID REL (ID | NUMBER) PS_CL 'entao' CB_OP
+cmd_condicional: 'se' PS_OP ID REL (ID | NUMBER) PS_CL 'entao' CB_OP
                     (cmd)+
                 CB_CL
                 (
                 'senao' CB_OP
-                    (cmd+)
+                    bloco
                 CB_CL
                 )?;
 
-expr		:  expr MATH  expr | termo
+expr		:  termo MATH expr | termo
 			;
 
-termo		: ID | NUMBER
+termo		: ID | NUMBER | PS_OP expr PS_CL
             ;
 // fator :
 //             NUMBER | ID | (expr)

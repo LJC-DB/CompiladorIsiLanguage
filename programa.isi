@@ -9,6 +9,9 @@ leia (b).
 
 asdaf342 := "Teste".
 
+enquanto (a < b) {
+    c := ((a) + b).
+}
 
 se (a < b) entao {
     c := a + b.
