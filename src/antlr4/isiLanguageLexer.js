@@ -160,13 +160,69 @@ export default class isiLanguageLexer extends antlr4.Lexer {
                 const varNome = this.pegueToken()
                 const symbol = new Symbol(varNome, this.varTipo, null)
                 this.sTable.addSymbol(varNome, symbol)
-                console.log(this.sTable.table)
             }
 
-            this.verificaVar = (v) => {
-                if (!this.sTable.existSymbol(v)) throw new SemanticError(`Variável "${v}" não foi declarada`)
-
+            this.verificaVar = (nome) => {
+                this.verificaDeclarada(nome);
+                this.verificaInicializada(nome);
             }
+
+            this.isNumero = (nome) => {
+                if (!this.sTable.existSymbol(nome)) throw new SemanticError(`Variável "${nome}" não foi declarada`)
+            }
+
+            this.getTipoVar = (nome) => {
+                return this.sTable.table[nome].tipo;
+            }
+
+            this.verificaTipo = (nome, tipo) => {
+                const varTipo = this.getTipoVar(nome);
+                if (varTipo !== tipo) {
+                    throw new SemanticError(`Erro de tipagem: A variável "${nome}" tem o tipo "${varTipo}" mas devia ter o tipo "${tipo}"`);
+                }
+                return tipo
+            }
+
+            this.relSuportaTipo = (rel, tipo) => {
+                if (tipo === 'numero') return true;
+
+                if (['==', '!='].includes(rel))
+                    return true;
+
+                throw new SemanticError(`bla`);
+            }
+
+            this.verificaDeclarada = (nome) => {
+                if (!this.sTable.existSymbol(nome)) throw new SemanticError(`Variável "${nome}" não foi declarada`)
+            }
+
+            this.verificaInicializada = (nome) => {
+                if (this.sTable.table[nome].temValor == false)
+                    throw new SemanticError(`Variável ${nome} não foi inicializada`);
+            }
+
+            this.inicializa = (nome) => {
+                this.sTable.table[nome].temValor = true;
+            }
+
+            this.utiliza = (nome) => {
+                this.sTable.table[nome].foiUtilizada = true;
+            }
+
+            this.tudoUtilizado = () => {
+                Object.values(this.sTable.table).forEach((item) => {
+                    if (item.foiUtilizada === false)
+                        console.warn(`Variável ${item.nome} não foi utilizada`);
+                });
+            }
+
+            this.tudoInicializado = () => {
+                Object.values(this.sTable.table).forEach((item) => {
+                    if (item.temValor === false)
+                        console.warn(`Variável ${item.nome} não foi inicializada`);
+                });
+            }
+
 
     }
 

@@ -12,25 +12,89 @@ grammar isiLanguage;
         const varNome = this.pegueToken()
         const symbol = new Symbol(varNome, this.varTipo, null)
         this.sTable.addSymbol(varNome, symbol)
-        console.log(this.sTable.table)
     }
 
-    this.verificaVar = (v) => {
-        if (!this.sTable.existSymbol(v)) throw new SemanticError(`Variável "${v}" não foi declarada`)
-
+    this.verificaVar = (nome) => {
+        this.verificaDeclarada(nome);
+        this.verificaInicializada(nome);
     }
+
+    this.isNumero = (nome) => {
+        if (!this.sTable.existSymbol(nome)) throw new SemanticError(`Variável "${nome}" não foi declarada`)
+    }
+
+    this.getTipoVar = (nome) => {
+        return this.sTable.table[nome].tipo;
+    }
+
+    this.verificaTipo = (nome, tipo) => {
+        const varTipo = this.getTipoVar(nome);
+        if (varTipo !== tipo) {
+            throw new SemanticError(`Erro de tipagem: A variável "${nome}" tem o tipo "${varTipo}" mas devia ter o tipo "${tipo}"`);
+        }
+        return tipo
+    }
+
+    this.relSuportaTipo = (rel, tipo) => {
+        if (tipo === 'numero') return true;
+
+        if (['==', '!='].includes(rel))
+            return true;
+
+        throw new SemanticError(`bla`);
+    }
+
+    this.verificaDeclarada = (nome) => {
+        if (!this.sTable.existSymbol(nome)) throw new SemanticError(`Variável "${nome}" não foi declarada`)
+    }
+
+    this.verificaInicializada = (nome) => {
+        if (this.sTable.table[nome].temValor == false)
+            throw new SemanticError(`Variável ${nome} não foi inicializada`);
+    }
+
+    this.inicializa = (nome) => {
+        this.sTable.table[nome].temValor = true;
+    }
+
+    this.utiliza = (nome) => {
+        this.sTable.table[nome].foiUtilizada = true;
+    }
+
+    this.tudoUtilizado = () => {
+        Object.values(this.sTable.table).forEach((item) => {
+            if (item.foiUtilizada === false)
+                console.warn(`Variável ${item.nome} não foi utilizada`);
+        });
+    }
+
+    this.tudoInicializado = () => {
+        Object.values(this.sTable.table).forEach((item) => {
+            if (item.temValor === false)
+                console.warn(`Variável ${item.nome} não foi inicializada`);
+        });
+    }
+
 }
 
-prog: 'programa' decl bloco  'fimprog.'
-        ;
+prog: 
+    'programa'
+    decl+
+    bloco
+    'fimprog.'
+        {
+        this.tudoInicializado();
+        this.tudoUtilizado();
+        }
+    ;
 
-decl:  
-    'declare' 
-    tipo { this.varTipo = this.pegueToken() } 
+decl:
+    'declare'
+    tipo { this.varTipo = this.pegueToken() }
     (declaraID)+
     ;
 
-declaraID:  
+declaraID:
     ID { this.declaraVar() }
     (
     COMMA
@@ -40,7 +104,7 @@ declaraID:
     ;
 
 tipo :
-      'numero' 
+      'numero'
     | 'texto'
     ;
 
@@ -56,23 +120,7 @@ cmd	: cmd_leitura
 
 cmd_loop :
     'enquanto'
-    PS_OP
-    ID
-        {
-        this.varNome = this.pegueToken()
-        this.verificaVar(this.varNome)
-        }
-    REL 
-    (
-    ID
-        {
-        this.varNome = this.pegueToken()
-        this.verificaVar(this.varNome)
-        } 
-    | 
-    NUMBER
-    ) 
-    PS_CL
+    expr_condicional
     CB_OP
     bloco
     CB_CL
@@ -81,83 +129,94 @@ cmd_loop :
 cmd_leitura	:
     'leia'
     PS_OP
-    ID 
+    ID
         {
         this.varNome = this.pegueToken()
-        this.verificaVar(this.varNome)
+        this.verificaDeclarada(this.varNome)
+        this.inicializa(this.varNome)
         }
     PS_CL
     DOT
     ;
 
-cmd_escrita	: 
-    'escreva' 
-    PS_OP
+cmd_escrita	:
+    'escreva'
+    PS_OP 
     (
-    ID 
+    ID
         {
         this.varNome = this.pegueToken()
         this.verificaVar(this.varNome)
+        this.utiliza(this.varNome)
+        // nome, 'numero'/'texto'
         }
     |
-    TEXTO
+    TEXTO // texto, 'texto
+    |
+    expr   //  Not sure (potentially wrong)
+            //expr, 'numero'
     )
     PS_CL
     DOT
     ;
 
-cmd_attrib	:  
+cmd_attrib:
     ID
         {
-        this.varNome = this.pegueToken()
-        this.verificaVar(this.varNome)
+        this.varNomeAtrib = this.pegueToken()
+        this.verificaDeclarada(this.varNomeAtrib)
         }
     ATTR
     (
-    expr
+    expr { this.verificaTipo(this.varNomeAtrib, 'numero') }
     |
-    TEXTO
+    TEXTO { this.verificaTipo(this.varNomeAtrib, 'texto') }
     )
-    DOT
+    DOT { this.inicializa(this.varNomeAtrib) }
     ;
 
-cmd_condicional: 
-    'se' 
-    PS_OP 
-    ID
-        {
-        this.varNome = this.pegueToken()
-        this.verificaVar(this.varNome)
-        }
-    REL
-    (
-    ID
-        {
-        this.varNome = this.pegueToken()
-        this.verificaVar(this.varNome)
-        } 
-    | 
-    NUMBER
-    ) 
-    PS_CL 
-    'entao' 
+cmd_condicional:
+    'se'
+    expr_condicional
+    'entao'
     CB_OP
-    (cmd)+
+    bloco
     CB_CL
     (
-    'senao' 
+    'senao'
     CB_OP
     bloco
     CB_CL
     )?
     ;
-    
+
+expr_condicional: 
+    PS_OP
+    ID
+        {
+        this.varNome = this.pegueToken()
+        this.varTipo = this.getTipoVar(this.varNome)
+        this.utiliza(this.varNome)
+        }
+    REL { this.relSuportaTipo(this.pegueToken(), this.varTipo) }
+    (
+    ID
+        {
+        this.varNome = this.pegueToken()
+        this.verificaVar(this.varNome, this.varTipo)
+        this.utiliza(this.varNome)
+        }
+    |
+    NUMBER {this.verificaVar(this.varNome, this.varTipo)}
+    )
+    PS_CL
+    ;
 
 expr :
     termo
-    MATH 
-    expr 
-    | 
+    MATH
+    expr
+    |
     termo
     ;
 
@@ -166,11 +225,12 @@ termo:
         {
             this.varNome = this.pegueToken()
             this.verificaVar(this.varNome)
-            // TODO: this.verificaTipo(this.varNome)
+            this.verificaTipo(this.varNome, 'numero')
+            this.utiliza(this.varNome)
         }
-    | 
+    |
     NUMBER
-    | 
+    |
     PS_OP
     expr
     PS_CL

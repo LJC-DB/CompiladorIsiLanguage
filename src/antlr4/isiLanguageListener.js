@@ -104,6 +104,15 @@ export default class isiLanguageListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
+	// Enter a parse tree produced by isiLanguageParser#expr_condicional.
+	enterExpr_condicional(ctx) {
+	}
+
+	// Exit a parse tree produced by isiLanguageParser#expr_condicional.
+	exitExpr_condicional(ctx) {
+	}
+
+
 	// Enter a parse tree produced by isiLanguageParser#expr.
 	enterExpr(ctx) {
 	}
