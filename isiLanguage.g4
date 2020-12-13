@@ -87,6 +87,15 @@ grammar isiLanguage;
     this.listaDeclaracao = [];
 
     this.condStack = new Pilha();
+
+    this.compile = () => {
+        this.tudoInicializado();
+        this.tudoUtilizado();
+
+        this.listaDeclaracao = [new Bloco(this.listaDeclaracao)];
+        this.programa = new Programa(this.listaDeclaracao, this.pilha.pop())
+        return this.programa.compila();
+    }
 }
 
 prog:
@@ -94,15 +103,6 @@ prog:
     decl+
     bloco
     'fimprog.'
-        {
-            this.tudoInicializado();
-            this.tudoUtilizado();
-
-            this.listaDeclaracao = [new Bloco(this.listaDeclaracao)];
-            this.programa = new Programa(this.listaDeclaracao, this.pilha.pop())
-
-            this.programa.compile()
-        }
     ;
 
 decl:

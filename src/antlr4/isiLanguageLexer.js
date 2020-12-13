@@ -236,6 +236,15 @@ export default class isiLanguageLexer extends antlr4.Lexer {
 
             this.condStack = new Pilha();
 
+            this.compile = () => {
+                this.tudoInicializado();
+                this.tudoUtilizado();
+
+                this.listaDeclaracao = [new Bloco(this.listaDeclaracao)];
+                this.programa = new Programa(this.listaDeclaracao, this.pilha.pop())
+                return this.programa.compila();
+            }
+
     }
 
     get atn() {

@@ -1,4 +1,3 @@
-import fs from 'fs';
 export class Programa {
   constructor(listaDeclaracao, listaComandos){
     this.listaDeclaracao = listaDeclaracao;
@@ -6,14 +5,10 @@ export class Programa {
   }
 
 
-  compile() {
-
-    const code = `#include <stdio.h>
-
-void main(void) {
-${this.listaDeclaracao.map(d => d.generateCode()).join('')}
-${this.listaComandos.map(c => c.generateCode()).join('\n')}}`;
-
-    fs.writeFileSync('compiladao.c', code);
+  compila() {
+    return '#include <stdio.h>\n\n'
+         + 'void main(void) {\n'
+         + `${this.listaDeclaracao.map(d => d.generateCode()).join('')}\n`
+         + `${this.listaComandos.map(c => c.generateCode()).join('\n')}}\n`;
   }
 }
