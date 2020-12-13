@@ -1,30 +1,21 @@
 programa
 
-declare numero a,b,c,d.
-declare texto t.
-escreva("Programa Teste").
-escreva ("batata").
+declare numero a,b.
+
+escreva("Digite A").
 leia (a).
-escreva ("Digite B").
+escreva("Digite B").
 leia (b).
 
-a := 5.
-
-enquanto (a < b) {
-    c := ((a) + b).
-}
-
-se (a < a) entao {
-    c := a + b.
+se (a < b) entao {
+    escreva("menor").
 } senao {
-    c := a - b.
+    escreva("nao menor").
 }
 
-t := "texto".
-
-d := c + a + 5.
-e := 5.
-escreva (d + 5).
-escreva (t).
+enquanto (a > b) {
+    escreva(b).
+    b := b + 0.1.
+}
 
 fimprog.

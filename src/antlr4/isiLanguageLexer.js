@@ -3,7 +3,18 @@
 import antlr4 from 'antlr4';
 
 
-    import { SymbolTable, Symbol, SemanticError } from '../batata.js'
+    import { TabelaSimbolos } from '../utils/tabelaSimbolos.js';
+    import { Simbolo } from '../structures/simbolo.js';
+    import { SemanticError } from '../errors/semanticError.js';
+    import { Bloco } from '../structures/bloco.js';
+    import { Programa } from '../structures/programa.js';
+    import { Atribuicao } from '../structures/atribuicao.js';
+    import { Condicional } from '../structures/condicional.js';
+    import { Declare } from '../structures/declare.js';
+    import { Enquanto } from '../structures/enquanto.js';
+    import { Escreve } from '../structures/escreve.js';
+    import { Leitura } from '../structures/leitura.js';
+    import { Pilha } from '../utils/pilha.js';
 
 
 
@@ -153,13 +164,13 @@ export default class isiLanguageLexer extends antlr4.Lexer {
         super(input)
         this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
 
-            this.sTable = new SymbolTable();
+            this.tabSim = new TabelaSimbolos();
             this.pegueToken = () => this._input.LT(-1).text;
 
             this.declaraVar = () => {
                 const varNome = this.pegueToken()
-                const symbol = new Symbol(varNome, this.varTipo, null)
-                this.sTable.addSymbol(varNome, symbol)
+                const simbolo = new Simbolo(varNome, this.varTipo, null)
+                this.tabSim.addSimbolo(varNome, simbolo)
             }
 
             this.verificaVar = (nome) => {
@@ -167,12 +178,8 @@ export default class isiLanguageLexer extends antlr4.Lexer {
                 this.verificaInicializada(nome);
             }
 
-            this.isNumero = (nome) => {
-                if (!this.sTable.existSymbol(nome)) throw new SemanticError(`Variável "${nome}" não foi declarada`)
-            }
-
             this.getTipoVar = (nome) => {
-                return this.sTable.table[nome].tipo;
+                return this.tabSim.table[nome].tipo;
             }
 
             this.verificaTipo = (nome, tipo) => {
@@ -193,36 +200,41 @@ export default class isiLanguageLexer extends antlr4.Lexer {
             }
 
             this.verificaDeclarada = (nome) => {
-                if (!this.sTable.existSymbol(nome)) throw new SemanticError(`Variável "${nome}" não foi declarada`)
+                if (!this.tabSim.existeSimbolo(nome)) throw new SemanticError(`Variável "${nome}" não foi declarada`)
             }
 
             this.verificaInicializada = (nome) => {
-                if (this.sTable.table[nome].temValor == false)
+                if (this.tabSim.table[nome].temValor == false)
                     throw new SemanticError(`Variável ${nome} não foi inicializada`);
             }
 
             this.inicializa = (nome) => {
-                this.sTable.table[nome].temValor = true;
+                this.tabSim.table[nome].temValor = true;
             }
 
             this.utiliza = (nome) => {
-                this.sTable.table[nome].foiUtilizada = true;
+                this.tabSim.table[nome].foiUtilizada = true;
             }
 
             this.tudoUtilizado = () => {
-                Object.values(this.sTable.table).forEach((item) => {
+                Object.values(this.tabSim.table).forEach((item) => {
                     if (item.foiUtilizada === false)
                         console.warn(`Variável ${item.nome} não foi utilizada`);
                 });
             }
 
             this.tudoInicializado = () => {
-                Object.values(this.sTable.table).forEach((item) => {
+                Object.values(this.tabSim.table).forEach((item) => {
                     if (item.temValor === false)
                         console.warn(`Variável ${item.nome} não foi inicializada`);
                 });
             }
 
+            this.currThread = [];
+            this.pilha = new Pilha([[]]);
+            this.listaDeclaracao = [];
+
+            this.condStack = new Pilha();
 
     }
 

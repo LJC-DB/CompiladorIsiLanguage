@@ -1,0 +1,45 @@
+programa
+
+declare numero a,b,c,d.
+declare texto t.
+escreva("Programa Teste").
+escreva ("batata").
+leia (a).
+escreva ("Digite B").
+leia (b).
+
+a := 5.
+
+enquanto (a <= b) {
+    c := ((a) + b).
+    
+    se (a < a) entao {
+        c := a + b.
+        d := 5.
+        d := 5.
+    } senao {
+        c := a - b.
+    }
+}
+
+se (a < a) entao {
+    c := a + b.
+    d := 5.
+    d = 5.
+
+    enquanto (a <= b) {
+    c := ((a) + b).
+    }
+}
+
+senao {
+    c := a - b.
+}
+
+t := "texto".
+
+d := c + a + 5.
+escreva (d + 5).
+escreva (t).
+
+fimprog.
