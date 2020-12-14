@@ -5,6 +5,6 @@ export class Atribuicao {
         this.valor = valor;
     }
     generateCode() {
-        return `${this.variavel} = ${this.valor};\n`;
+        return `${this.variavel} =${this.valor};\n`;
     }
 }

@@ -1,8 +1,13 @@
 import fs from 'fs';
 import antlr4 from 'antlr4';
+
 import MyGrammarLexer from './antlr4/isiLanguageLexer.js';
 import MyGrammarParser from './antlr4/isiLanguageParser.js';
-import MyGrammarListener from './antlr4/isiLanguageListener.js';
+import { LexicalErrorListener } from './errors/listeners/lexicalErrorListener.js';
+import { SyntacticErrorListener } from './errors/listeners/syntacticErrorListener.js';
+import { SemanticError } from './errors/semanticError.js';
+import { LexicalError } from './errors/lexicalError.js';
+import { SyntacticError } from './errors/syntacticError.js';
 
 const fileName = process.argv[2];
 const destino = process.argv[3];
@@ -37,8 +42,52 @@ const tokens = new antlr4.CommonTokenStream(lexer);
 const parser = new MyGrammarParser(tokens);
 parser.buildParseTrees = true;
 
-const tree = parser.prog();
-const compilado = tree.parser.compile(destino);
+lexer.removeErrorListeners();
+parser.removeErrorListeners();
+
+const syntacticListener = new SyntacticErrorListener();
+const lexicalListener = new LexicalErrorListener();
+
+lexer.addErrorListener(lexicalListener);
+parser.addErrorListener(syntacticListener);
+
+let tree;
+
+try {
+    tree = parser.prog();
+} catch (e) {
+    if (e instanceof SemanticError) {
+        console.log('Erro semântico')
+        console.log(e.message)
+    }
+
+    else if (e instanceof SyntacticError) {
+        console.log('Erro sintático')
+        console.log(e.message)
+    }
+
+    else if (e instanceof LexicalError) {
+        console.log('Erro léxico')
+        console.log(e.message);
+    }
+
+    else {
+        console.log('Erro inesperado');
+        console.log(e);
+    }
+
+    process.exit(1);
+}
+
+let compilado;
+
+try {
+    compilado = tree.parser.compile(destino);
+} catch (e) {
+    console.log("Erro inesperado ao compilar");
+    console.log(e);
+    process.exit(1);
+}
 
 try {
     fs.writeFileSync(`${destino}.c`, compilado);

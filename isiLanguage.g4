@@ -1,18 +1,20 @@
 grammar isiLanguage;
 
 @header{
-    import { TabelaSimbolos } from '../utils/tabelaSimbolos.js';
-    import { Simbolo } from '../structures/simbolo.js';
-    import { SemanticError } from '../errors/semanticError.js';
-    import { Bloco } from '../structures/bloco.js';
-    import { Programa } from '../structures/programa.js';
     import { Atribuicao } from '../structures/atribuicao.js';
+    import { Bloco } from '../structures/bloco.js';
     import { Condicional } from '../structures/condicional.js';
     import { Declare } from '../structures/declare.js';
     import { Enquanto } from '../structures/enquanto.js';
     import { Escreve } from '../structures/escreve.js';
     import { Leitura } from '../structures/leitura.js';
+    import { Para } from '../structures/para.js';
     import { Pilha } from '../utils/pilha.js';
+    import { Programa } from '../structures/programa.js';
+    import { Retorna } from '../structures/retorna.js';
+    import { SemanticError } from '../errors/semanticError.js';
+    import { Simbolo } from '../structures/simbolo.js';
+    import { TabelaSimbolos } from '../utils/tabelaSimbolos.js';
 }
 
 @members{
@@ -149,22 +151,49 @@ bloco :
         }
     ;
 
-cmd	: cmd_leitura
-      | cmd_escrita
-      | cmd_attrib
+cmd	: cmd_leitura DOT
+      | cmd_escrita DOT
+      | cmd_attrib DOT
       | cmd_condicional
       | cmd_loop
+      | cmd_retorna DOT
+      | cmd_para
       ;
+
+cmd_retorna: 'retorna' { this.pilha.peek().push(new Retorna()) } ;
 
 cmd_loop :
     'enquanto'
+    PS_OP
     expr_condicional
+    PS_CL { this.condStack.push(this.exprCond) }
     CB_OP
     bloco
         {
             this.listaEnquanto = this.pilha.pop()
             this.exprCond = this.condStack.pop()
             this.pilha.peek().push(new Enquanto(this.exprCond, this.listaEnquanto))
+        }
+    CB_CL
+    ;
+
+cmd_para :
+    'para'
+    PS_OP { this.attr1 = null }
+    (cmd_attrib { this.attr1 = this.pilha.peek().pop() })?
+    DOT {this.exprCond = null }
+    expr_condicional?
+    DOT { this.attr2 = null }
+    (cmd_attrib { this.attr2 = this.pilha.peek().pop() } )?
+    PS_CL
+    CB_OP
+        { this.pilha.peek().push(new Para(this.attr1, this.exprCond, this.attr2)) }
+    bloco
+        {
+            this.listaFor = this.pilha.pop()
+            this.para = this.pilha.peek().pop()
+            this.para.adicionaBloco(this.listaFor)
+            this.pilha.peek().push(this.para)
         }
     CB_CL
     ;
@@ -180,7 +209,7 @@ cmd_leitura	:
             this.pilha.peek().push(new Leitura(this.tabSim.table[this.varNome]))
         }
     PS_CL
-    DOT
+    
     ;
 
 cmd_escrita	:
@@ -212,7 +241,7 @@ cmd_escrita	:
         }
     )
     PS_CL
-    DOT { this.pilha.peek().push(new Escreve(this.valor, this.varTipo)) }
+    { this.pilha.peek().push(new Escreve(this.valor, this.varTipo)) }
     ;
 
 cmd_attrib:
@@ -236,7 +265,6 @@ cmd_attrib:
             this.valor = this.pegueToken()
         }
     )
-    DOT
         {
             this.inicializa(this.varNomeAtrib)
             this.pilha.peek().push(new Atribuicao(this.varNomeAtrib, this.valor))
@@ -245,7 +273,9 @@ cmd_attrib:
 
 cmd_condicional:
     'se'
+    PS_OP
     expr_condicional
+    PS_CL { this.condStack.push(this.exprCond) }
     'entao'
     CB_OP
     bloco
@@ -266,7 +296,6 @@ cmd_condicional:
     ;
 
 expr_condicional:
-    PS_OP
     ID
         {
             this.varNome = this.pegueToken();
@@ -294,7 +323,6 @@ expr_condicional:
             this.exprCond += " " + this.pegueToken();
         }
     )
-    PS_CL { this.condStack.push(this.exprCond) }
     ;
 
 expr:
@@ -317,9 +345,9 @@ termo:
     |
     NUMBER { this.expressao += ' ' + this.pegueToken() }
     |
-    PS_OP
+    PS_OP { this.expressao += ' ' + this.pegueToken() }
     expr
-    PS_CL
+    PS_CL { this.expressao += ' ' + this.pegueToken() }
     ;
 
 PS_OP: '(';
@@ -338,10 +366,10 @@ COMMA: ',';
 
 REL: '>' | '<' | '>=' | '<=' | '==' | '!=';
 
-TEXTO: '"'([a-z] | [A-Z] | [0-9] | ' ')* '"';
+TEXTO: '"'  ([a-z] | [A-Z] | [À-ú] | [0-9] | ' ')* '"' ;
 
 ID: [a-z] ([a-z] | [A-Z] | [0-9])*;
 
 NUMBER: [0-9]+ ('.' [0-9]+)?;
 
-WS: (' ' | '\t' | '\n' | '\r') -> skip;
+WS: (' ' | '\t' | '\n' | '\r' | '//' .*? '\n' ) -> skip;

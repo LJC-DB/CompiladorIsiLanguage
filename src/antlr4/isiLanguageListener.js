@@ -59,12 +59,30 @@ export default class isiLanguageListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
+	// Enter a parse tree produced by isiLanguageParser#cmd_retorna.
+	enterCmd_retorna(ctx) {
+	}
+
+	// Exit a parse tree produced by isiLanguageParser#cmd_retorna.
+	exitCmd_retorna(ctx) {
+	}
+
+
 	// Enter a parse tree produced by isiLanguageParser#cmd_loop.
 	enterCmd_loop(ctx) {
 	}
 
 	// Exit a parse tree produced by isiLanguageParser#cmd_loop.
 	exitCmd_loop(ctx) {
+	}
+
+
+	// Enter a parse tree produced by isiLanguageParser#cmd_para.
+	enterCmd_para(ctx) {
+	}
+
+	// Exit a parse tree produced by isiLanguageParser#cmd_para.
+	exitCmd_para(ctx) {
 	}
 
 
