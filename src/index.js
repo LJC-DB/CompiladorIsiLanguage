@@ -10,12 +10,7 @@ import { LexicalError } from './errors/lexicalError.js';
 import { SyntacticError } from './errors/syntacticError.js';
 
 const fileName = process.argv[2];
-const destino = process.argv[3];
-
-if (!destino) {
-    console.log('Informe o arquivo de destino');
-    process.exit(1);
-}
+const destino = process.argv[3] || fileName.replace('.isi', '');
 
 if (!fileName.endsWith('.isi')) {
     console.log('Arquivo deve ter extensão isi');
