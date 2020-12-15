@@ -209,7 +209,7 @@ cmd_leitura	:
             this.pilha.peek().push(new Leitura(this.tabSim.table[this.varNome]))
         }
     PS_CL
-    
+
     ;
 
 cmd_escrita	:
@@ -267,7 +267,7 @@ cmd_attrib:
     )
         {
             this.inicializa(this.varNomeAtrib)
-            this.pilha.peek().push(new Atribuicao(this.varNomeAtrib, this.valor))
+            this.pilha.peek().push(new Atribuicao(this.tabSim.table[this.varNomeAtrib], this.valor))
         }
     ;
 
