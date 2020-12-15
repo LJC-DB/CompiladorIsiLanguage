@@ -1,0 +1,25 @@
+programa
+
+declare numero a,b,c,d.
+
+escreva("Programa Teste").
+escreva ("Digite A").
+leia (a).
+
+escreva ("Digite B").
+leia (b).
+
+se (a < b) entao {
+    c := a + b.
+} senao {
+    c := a - b.
+}
+
+escreva ("C é igual a ").
+escreva (c).
+
+d := c * a + b.
+escreva ("D é igual a ").
+escreva (d).
+
+fimprog.

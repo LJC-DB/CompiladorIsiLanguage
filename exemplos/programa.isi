@@ -1,0 +1,31 @@
+programa
+
+declare numero a, b.
+
+escreva("Digite A").
+leia (a).
+escreva("Digite B").
+leia (b).
+
+se (a < b) entao {
+    escreva("menor").
+} senao {
+    escreva("não menor").
+}
+
+para (a:=3. a < 5 . a := a+1) {
+    escreva("entrou").
+    se (a == 4) entao {
+        para (b := 3. b < 4. b := b + 1) {
+            escreva(a+b).
+        }
+    }
+}
+
+enquanto (a > b) {
+    escreva(b).
+    a := 3 * b.
+    retorna.
+}
+
+fimprog.

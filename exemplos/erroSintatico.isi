@@ -1,0 +1,11 @@
+programa
+
+// Tipos das variaveis nao foram definidos
+declare a, b.
+
+a := 1.
+b := 2.
+
+escreva(a + b).
+
+fimprog.

@@ -1,0 +1,11 @@
+programa
+
+declare texto t.
+
+t := "batata".
+
+leia(t).
+
+escreva(t).
+
+fimprog.

@@ -818,7 +818,7 @@ export default class isiLanguageParser extends antlr4.Parser {
 	        }
 
 	                    this.inicializa(this.varNomeAtrib)
-	                    this.pilha.peek().push(new Atribuicao(this.varNomeAtrib, this.valor))
+	                    this.pilha.peek().push(new Atribuicao(this.tabSim.table[this.varNomeAtrib], this.valor))
 	                
 	    } catch (re) {
 	    	if(re instanceof antlr4.error.RecognitionException) {

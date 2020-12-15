@@ -5,12 +5,10 @@ export class Declare {
         this.tipo = tipo;
     }
 
-    mapper = {
-        'numero': 'float',
-        'texto': 'char*',
-    };
-
     generateCode() {
-        return `${this.mapper[this.tipo]} ${this.nomes.join(', ')};\n`;
+        if (this.tipo === 'numero') {
+            return `float ${this.nomes.join(', ')};\n`;
+        }
+        return `char ${this.nomes.join('[100], ')}[100];\n`;
     }
 }

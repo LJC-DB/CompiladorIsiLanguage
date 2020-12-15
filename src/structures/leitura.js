@@ -4,12 +4,10 @@ export class Leitura {
         this.variavel = variavel;
     }
 
-    mapper = {
-        'numero': 'f',
-        'texto': 's',
-    };
 
     generateCode() {
-        return `scanf("%${this.mapper[this.variavel.tipo]}", &${this.variavel.nome});\n`;
+        if (this.variavel.tipo === 'numero')
+            return `scanf("%f", &${this.variavel.nome});\n`;
+        return `scanf("%s", ${this.variavel.nome});\n`;
     }
 }

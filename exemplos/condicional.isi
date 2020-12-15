@@ -1,0 +1,20 @@
+programa
+
+declare numero a, b.
+
+escreva("Digite A").
+leia (a).
+escreva("Digite B").
+leia (b).
+
+se (a > b) entao {
+  escreva("a é maior que b").
+} senao {
+  se (a < b) entao {
+    escreva("b é maior que a").
+  } senao {
+    escreva("a é igual a b").
+  }
+}
+
+fimprog.

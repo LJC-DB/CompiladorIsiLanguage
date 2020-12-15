@@ -1,0 +1,12 @@
+programa
+
+declare texto t.
+declare numero n.
+
+t := "not a number".
+n := 42.
+
+// Soma de numero e texto
+escreva(t + n).
+
+fimprog.

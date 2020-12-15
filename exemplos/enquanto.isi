@@ -1,0 +1,15 @@
+programa
+
+declare numero a, b.
+
+escreva("Digite A").
+leia (a).
+escreva("Digite B").
+leia (b).
+
+enquanto (a > b) {
+  escreva(b).
+  b := b + 1.
+}
+
+fimprog.

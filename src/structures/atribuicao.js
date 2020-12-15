@@ -5,6 +5,8 @@ export class Atribuicao {
         this.valor = valor;
     }
     generateCode() {
-        return `${this.variavel} =${this.valor};\n`;
+        if (this.variavel.tipo === 'numero')
+            return `${this.variavel.nome} =${this.valor};\n`;
+        return `strcpy(${this.variavel.nome}, ${this.valor});\n`;
     }
 }

@@ -1,0 +1,8 @@
+programa
+
+declare texto t. 
+
+// Variável t não foi inicializada.
+escreva(t).
+
+fimprog.

@@ -1,0 +1,17 @@
+programa
+
+declare numero n, i, a.
+
+escreva("Digite n").
+leia (n).
+
+a := 3.
+
+para (i := 0 . i < n . i := i + 1) {
+    se (i == a) entao {
+        retorna.
+    }
+    escreva(i).
+}
+
+fimprog.
